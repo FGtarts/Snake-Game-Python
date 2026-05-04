@@ -23,7 +23,16 @@ class Food:
         y =  random.randint(0,NUMBER_OF_CELLS-1)
         positon = Vector2(x,y)
         return positon
+
+class Snake:
+    def __init__(self):
+        self.body = [Vector2(6,9),Vector2(5,9),Vector2(4,9)]
+    def draw(self):
+        for segment in self.body:
+            segment_rect = (segment.x * CELL_SIZE, segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(screen,DARK_GREEN,segment_rect,0,5)
     
+
 
 screen  = pygame.display.set_mode((CELL_SIZE * NUMBER_OF_CELLS, CELL_SIZE * NUMBER_OF_CELLS))
 
@@ -34,6 +43,8 @@ clock = pygame.time.Clock()
 food = Food()
 food_surface = pygame.image.load("Project-files/Graphics/apple.png")
 
+snake = Snake()
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -42,6 +53,8 @@ while True:
 
     screen.fill(GREEN)
     food.draw()
+    snake.draw()
+
     pygame.display.update()
     clock.tick(60)
     
