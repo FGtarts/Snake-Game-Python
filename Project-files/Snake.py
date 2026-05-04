@@ -3,6 +3,9 @@ from pygame.math import Vector2
 
 pygame.init()
 
+title_font = pygame.font.Font(None,60)
+score_display = pygame.font.Font(None,60)
+
 #COLORS
 GREEN = (173,204,96)
 DARK_GREEN = (43,51,24)
@@ -10,7 +13,8 @@ RED = (166,33,29)
 
 #DIMENSIONS
 CELL_SIZE = 30
-NUMBER_OF_CELLS = 25
+NUMBER_OF_CELLS = 20
+OFFSET = 75
 
 #CLASSES
 class Food:
@@ -18,7 +22,7 @@ class Food:
         self.positon = self.generate_random_pos(snake_body)
 
     def draw(self):
-        food_rect = pygame.Rect(self.positon.x * CELL_SIZE, self.positon.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        food_rect = pygame.Rect(OFFSET + self.positon.x * CELL_SIZE, OFFSET + self.positon.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
         screen.blit(food_surface, food_rect)
 
     def generate_random_cell(self):
@@ -39,7 +43,7 @@ class Snake:
 
     def draw(self):
         for segment in self.body:
-            segment_rect = (segment.x * CELL_SIZE, segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            segment_rect = (OFFSET + segment.x * CELL_SIZE, OFFSET + segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             pygame.draw.rect(screen,DARK_GREEN,segment_rect,0,5)
     
     def update(self):
@@ -57,6 +61,7 @@ class Game:
         self.snake = Snake()
         self.food = Food(self.snake.body)
         self.state = "RUNNING"
+        self.score = 0
 
     def draw(self):
         self.snake.draw()
@@ -74,6 +79,7 @@ class Game:
             print("NOM NOM NOM")
             self.food.positon = self.food.generate_random_pos(self.snake.body)
             self.snake.add_segment = True
+            self.score += 1
 
     def check_collision_with_border(self):
         if self.snake.body[0].x == NUMBER_OF_CELLS or self.snake.body[0].x == -1:
@@ -90,9 +96,10 @@ class Game:
         self.snake.reset()
         self.food.positon = self.food.generate_random_pos(self.snake.body)
         self.state = "PAUSED"
+        self.score = 0
 
 #SCREEN STUFF
-screen  = pygame.display.set_mode((CELL_SIZE * NUMBER_OF_CELLS, CELL_SIZE * NUMBER_OF_CELLS))
+screen  = pygame.display.set_mode((2 * OFFSET + CELL_SIZE * NUMBER_OF_CELLS, 2 * OFFSET + CELL_SIZE * NUMBER_OF_CELLS))
 pygame.display.set_caption("Retro Snake Game")
 clock = pygame.time.Clock()
 
@@ -130,8 +137,14 @@ while True:
 
     #DRAWING THE OBJECTS
     screen.fill(GREEN)
+    pygame.draw.rect(screen,DARK_GREEN,(OFFSET - 5,OFFSET - 5,CELL_SIZE * NUMBER_OF_CELLS + 10,CELL_SIZE * NUMBER_OF_CELLS + 10),5)
     game.draw()
-    game.draw()
+
+    title_surface = title_font.render("Hishams Retro Snake", True, RED)
+    screen.blit(title_surface,(OFFSET-5, 20))
+
+    score_surface = score_display.render(str(game.score),True,RED)
+    screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 15, 20))
 
     #OTHER STUFF
     pygame.display.update()
