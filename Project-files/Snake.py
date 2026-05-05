@@ -178,9 +178,9 @@ while True:
     #DRAWING THE GRID
     for row in range(NUMBER_OF_CELLS):
         for col in range(NUMBER_OF_CELLS):
-            color = GREEN if (row + col) % 2 == 0 else SLIGHTLY_DARKER_GREEN
-            cell_rect = (OFFSET + col * CELL_SIZE, OFFSET + row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            pygame.draw.rect(screen, color, cell_rect)
+            grid_cell_color = GREEN if (row + col) % 2 == 0 else SLIGHTLY_DARKER_GREEN
+            grid_cell_rect = (OFFSET + col * CELL_SIZE, OFFSET + row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(screen, grid_cell_color, grid_cell_rect)
 
     #TEXT AND SCORE DISPLAY
     game.draw()
