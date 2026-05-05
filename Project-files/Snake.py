@@ -3,6 +3,7 @@ from pygame.math import Vector2
 
 pygame.init()
 
+#FONTS
 title_font = pygame.font.Font(None,60)
 score_display = pygame.font.Font(None,40)
 high_score_display = pygame.font.Font(None,40)
@@ -10,6 +11,7 @@ developer_display = pygame.font.Font(None,40)
 
 #COLORS
 GREEN = (173,204,96)
+SLIGHTLY_DARKER_GREEN = (150, 180, 85)
 DARK_GREEN = (43,51,24)
 RED = (166,33,29)
 
@@ -130,7 +132,7 @@ screen  = pygame.display.set_mode((2 * OFFSET + CELL_SIZE * NUMBER_OF_CELLS, 2 *
 pygame.display.set_caption("Retro Snake Game")
 clock = pygame.time.Clock()
 
-#MORE STUFF
+#INITIALIZATION AND CUSTOM EVENTS AND STUFF
 game = Game()
 food_surface = pygame.image.load("Project-files/Graphics/apple.png")
 SNAKE_UPDATE = pygame.USEREVENT
@@ -169,11 +171,18 @@ while True:
             pygame.quit()
             sys.exit()
 
-
-
     #DRAWING THE OBJECTS
     screen.fill(GREEN)
     pygame.draw.rect(screen,DARK_GREEN,(OFFSET - 5,OFFSET - 5,CELL_SIZE * NUMBER_OF_CELLS + 10,CELL_SIZE * NUMBER_OF_CELLS + 10),5)
+
+    #DRAWING THE GRID
+    for row in range(NUMBER_OF_CELLS):
+        for col in range(NUMBER_OF_CELLS):
+            color = GREEN if (row + col) % 2 == 0 else SLIGHTLY_DARKER_GREEN
+            cell_rect = (OFFSET + col * CELL_SIZE, OFFSET + row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(screen, color, cell_rect)
+
+    #TEXT AND SCORE DISPLAY
     game.draw()
 
     title_surface = title_font.render("Retro Snake", True, RED)
@@ -188,6 +197,7 @@ while True:
     developer_surface = developer_display.render("By Frogtarts", True, RED)
     screen.blit(developer_surface, (OFFSET - 5, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
 
+    #GAME STATE DETAILS
     if game.state == "PAUSED":
         paused_surface = score_display.render("GAME PAUSED", True, RED)
         paused_rect = paused_surface.get_rect(center=(OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2, OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2 - 20))
@@ -205,8 +215,6 @@ while True:
         restart_surface = developer_display.render("Press R to restart", True, RED)
         restart_rect = restart_surface.get_rect(center=(OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2, OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2 + 20))
         screen.blit(restart_surface, restart_rect)
-
-
 
     #OTHER STUFF
     pygame.display.update()
