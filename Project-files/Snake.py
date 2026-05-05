@@ -40,18 +40,15 @@ class Snake:
     def __init__(self):
         self.body = [Vector2(6,9),Vector2(5,9),Vector2(4,9)]
         self.direction = Vector2(1,0)
-        self.add_segment = False
 
     def draw(self):
         for segment in self.body:
             segment_rect = (OFFSET + segment.x * CELL_SIZE, OFFSET + segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             pygame.draw.rect(screen,DARK_GREEN,segment_rect,0,5)
     
-    def update(self):
+    def update(self, grow=False):
         self.body.insert(0, self.body[0] + self.direction)
-        if self.add_segment == True:
-            self.add_segment = False
-        else:
+        if not grow:
             self.body = self.body[:-1]
 
     def reset(self):
@@ -71,10 +68,18 @@ class Game:
 
     def update(self):
         if self.state == "RUNNING":
-            self.snake.update()
-            self.check_collision_with_food()
-            self.check_collision_with_border()
-            self.check_collision_with_tail()
+            next_head = self.snake.body[0] + self.snake.direction
+            will_grow = next_head == self.food.positon
+
+            if self.check_collision_with_border(next_head):
+                return
+            if self.check_collision_with_tail(next_head, will_grow):
+                return
+
+            self.snake.update(grow=will_grow)
+            if will_grow:
+                self.score += 1
+                self.food.positon = self.food.generate_random_pos(self.snake.body)
 
     def reset_game(self):
         self.snake.reset()
@@ -82,22 +87,21 @@ class Game:
         self.score = 0
         self.state = "RUNNING"
 
-    def check_collision_with_food(self):
-        if self.snake.body[0] == self.food.positon:
-            self.food.positon = self.food.generate_random_pos(self.snake.body)
-            self.snake.add_segment = True
-            self.score += 1
+    def check_collision_with_border(self, position):
+        if position.x < 0 or position.x >= NUMBER_OF_CELLS:
+            self.game_over()
+            return True
+        if position.y < 0 or position.y >= NUMBER_OF_CELLS:
+            self.game_over()
+            return True
+        return False
 
-    def check_collision_with_border(self):
-        if self.snake.body[0].x == NUMBER_OF_CELLS -1 or self.snake.body[0].x == -1:
+    def check_collision_with_tail(self, next_head, will_grow):
+        body_to_check = self.snake.body if will_grow else self.snake.body[:-1]
+        if next_head in body_to_check:
             self.game_over()
-        if self.snake.body[0].y == NUMBER_OF_CELLS -1 or self.snake.body[0].y == -1:
-            self.game_over()
-
-    def check_collision_with_tail(self):
-        headless_body = self.snake.body[1:]
-        if self.snake.body[0] in headless_body:
-            self.game_over()
+            return True
+        return False
 
     def game_over(self):
         self.state = "GAME_OVER"
