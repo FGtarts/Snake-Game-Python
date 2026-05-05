@@ -40,6 +40,7 @@ class Snake:
     def __init__(self):
         self.body = [Vector2(6,9),Vector2(5,9),Vector2(4,9)]
         self.direction = Vector2(1,0)
+        self.direction_queue = []
 
     def draw(self):
         for segment in self.body:
@@ -54,6 +55,20 @@ class Snake:
     def reset(self):
         self.body = [Vector2(6,9),Vector2(5,9),Vector2(4,9)]
         self.direction = Vector2(1,0)
+        self.direction_queue = []
+
+    def queue_direction(self, new_direction):
+        reference_direction = self.direction_queue[-1] if self.direction_queue else self.direction
+        if new_direction == reference_direction:
+            return
+        if new_direction + reference_direction == Vector2(0,0):
+            return
+        if len(self.direction_queue) < 2:
+            self.direction_queue.append(new_direction)
+
+    def apply_queued_direction(self):
+        if self.direction_queue:
+            self.direction = self.direction_queue.pop(0)
         
 class Game:
     def __init__(self):
@@ -68,6 +83,7 @@ class Game:
 
     def update(self):
         if self.state == "RUNNING":
+            self.snake.apply_queued_direction()
             next_head = self.snake.body[0] + self.snake.direction
             will_grow = next_head == self.food.positon
 
@@ -138,14 +154,14 @@ while True:
 
             #SNAKE DIRECTION CONTROL
             if game.state == "RUNNING":
-                if event.key in (pygame.K_UP, pygame.K_w) and game.snake.direction != Vector2(0,1):
-                    game.snake.direction = Vector2(0,-1)
-                if event.key in (pygame.K_DOWN, pygame.K_s) and game.snake.direction != Vector2(0,-1):
-                    game.snake.direction = Vector2(0,1)
-                if event.key in (pygame.K_RIGHT, pygame.K_d) and game.snake.direction != Vector2(-1,0):
-                    game.snake.direction = Vector2(1,0)
-                if event.key in (pygame.K_LEFT, pygame.K_a) and game.snake.direction != Vector2(1,0):
-                    game.snake.direction = Vector2(-1,0)
+                if event.key in (pygame.K_UP, pygame.K_w):
+                    game.snake.queue_direction(Vector2(0,-1))
+                if event.key in (pygame.K_DOWN, pygame.K_s):
+                    game.snake.queue_direction(Vector2(0,1))
+                if event.key in (pygame.K_RIGHT, pygame.K_d):
+                    game.snake.queue_direction(Vector2(1,0))
+                if event.key in (pygame.K_LEFT, pygame.K_a):
+                    game.snake.queue_direction(Vector2(-1,0))
 
         if event.type == pygame.QUIT:
             pygame.quit()
