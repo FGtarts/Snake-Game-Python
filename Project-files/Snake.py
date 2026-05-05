@@ -1,5 +1,9 @@
-import pygame,sys,random
+import pygame,sys,random,os
 from pygame.math import Vector2
+
+def resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
 pygame.init()
 
@@ -45,13 +49,13 @@ class Snake:
         self.direction = Vector2(1,0)
         self.direction_queue = []
 
-        self.eating_sound = pygame.mixer.Sound("Project-files/Sounds/eating.mp3")
+        self.eating_sound = pygame.mixer.Sound(resource_path("Sounds/eating.mp3"))
         self.eating_sound.set_volume(0.9)
-        self.collision_sound = pygame.mixer.Sound("Project-files/Sounds/collision.mp3")
+        self.collision_sound = pygame.mixer.Sound(resource_path("Sounds/collision.mp3"))
         self.collision_sound.set_volume(1.2)
-        self.slither_sound = pygame.mixer.Sound("Project-files/Sounds/slither.mp3")
+        self.slither_sound = pygame.mixer.Sound(resource_path("Sounds/slither.mp3"))
         self.slither_sound.set_volume(0.9) 
-        self.background_music = pygame.mixer.Sound("Project-files/Sounds/background_music.mp3")
+        self.background_music = pygame.mixer.Sound(resource_path("Sounds/background_music.mp3"))
         self.background_music.set_volume(0.3)
         self.bg_music_channel = self.background_music.play(-1)
 
@@ -150,9 +154,9 @@ clock = pygame.time.Clock()
 
 #INITIALIZATION AND CUSTOM EVENTS AND STUFF
 game = Game()
-food_surface = pygame.image.load("Project-files/Graphics/apple.png")
-speaker_on_surface = pygame.transform.scale(pygame.image.load("Project-files/Graphics/speaker_on.png"), (45, 45))
-speaker_off_surface = pygame.transform.scale(pygame.image.load("Project-files/Graphics/speaker_off.png"), (45, 45))
+food_surface = pygame.image.load(resource_path("Graphics/apple.png"))
+speaker_on_surface = pygame.transform.scale(pygame.image.load(resource_path("Graphics/speaker_on.png")), (45, 45))
+speaker_off_surface = pygame.transform.scale(pygame.image.load(resource_path("Graphics/speaker_off.png")), (45, 45))
 SNAKE_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SNAKE_UPDATE,175)
 snake_length = len(game.snake.body)
