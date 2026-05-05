@@ -5,6 +5,7 @@ pygame.init()
 
 title_font = pygame.font.Font(None,60)
 score_display = pygame.font.Font(None,60)
+author_display = pygame.font.Font(None,40)
 
 #COLORS
 GREEN = (173,204,96)
@@ -76,7 +77,6 @@ class Game:
 
     def check_collision_with_food(self):
         if self.snake.body[0] == self.food.positon:
-            print("NOM NOM NOM")
             self.food.positon = self.food.generate_random_pos(self.snake.body)
             self.snake.add_segment = True
             self.score += 1
@@ -140,11 +140,14 @@ while True:
     pygame.draw.rect(screen,DARK_GREEN,(OFFSET - 5,OFFSET - 5,CELL_SIZE * NUMBER_OF_CELLS + 10,CELL_SIZE * NUMBER_OF_CELLS + 10),5)
     game.draw()
 
-    title_surface = title_font.render("Hishams Retro Snake", True, RED)
+    title_surface = title_font.render("Retro Snake", True, RED)
     screen.blit(title_surface,(OFFSET-5, 20))
 
-    score_surface = score_display.render(str(game.score),True,RED)
-    screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 15, 20))
+    score_surface = score_display.render(str(game.score).zfill(3),True,RED)
+    screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 65, 20))
+
+    author_surface = author_display.render("By Hisham mega super genius", True, RED)
+    screen.blit(author_surface, (OFFSET - 5, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
 
     #OTHER STUFF
     pygame.display.update()
