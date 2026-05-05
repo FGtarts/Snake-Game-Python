@@ -44,8 +44,17 @@ class Snake:
         self.body = [Vector2(6,9),Vector2(5,9),Vector2(4,9)]
         self.direction = Vector2(1,0)
         self.direction_queue = []
+
         self.eating_sound = pygame.mixer.Sound("Project-files/Sounds/eating.mp3")
+        self.eating_sound.set_volume(0.9)
         self.collision_sound = pygame.mixer.Sound("Project-files/Sounds/collision.mp3")
+        self.collision_sound.set_volume(1.2)
+        self.slither_sound = pygame.mixer.Sound("Project-files/Sounds/slither.mp3")
+        self.slither_sound.set_volume(0.9) 
+        self.background_music = pygame.mixer.Sound("Project-files/Sounds/background_music.mp3")
+        self.background_music.set_volume(0.3)
+        self.bg_music_channel = self.background_music.play(-1)
+
 
     def draw(self):
         for segment in self.body:
@@ -73,6 +82,7 @@ class Snake:
 
     def apply_queued_direction(self):
         if self.direction_queue:
+            self.slither_sound.play()
             self.direction = self.direction_queue.pop(0)
 class Game:
     def __init__(self):
@@ -141,18 +151,40 @@ clock = pygame.time.Clock()
 #INITIALIZATION AND CUSTOM EVENTS AND STUFF
 game = Game()
 food_surface = pygame.image.load("Project-files/Graphics/apple.png")
+speaker_on_surface = pygame.transform.scale(pygame.image.load("Project-files/Graphics/speaker_on.png"), (45, 45))
+speaker_off_surface = pygame.transform.scale(pygame.image.load("Project-files/Graphics/speaker_off.png"), (45, 45))
 SNAKE_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SNAKE_UPDATE,175)
 snake_length = len(game.snake.body)
+music_on = True
+MUSIC_BTN_RECT = pygame.Rect(2 * OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 55, 7, 45, 45)
 
 #MAIN GAME LOOP
 while True:
+
+    #EVENT HANDLING
     for event in pygame.event.get():
 
         if event.type == SNAKE_UPDATE:
             game.update()
 
+        #MUSIC TOGGLE
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if MUSIC_BTN_RECT.collidepoint(event.pos):
+                music_on = not music_on
+                if music_on:
+                    game.snake.bg_music_channel.unpause()
+                else:
+                    game.snake.bg_music_channel.pause()
+
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_m:
+                music_on = not music_on
+                if music_on:
+                    game.snake.bg_music_channel.unpause()
+                else:
+                    game.snake.bg_music_channel.pause()
+
             #GAME STATE CONTROL
             if event.key == pygame.K_SPACE:
                 if game.state == "RUNNING":
@@ -177,6 +209,7 @@ while True:
             pygame.quit()
             sys.exit()
 
+
     #DRAWING THE OBJECTS
     screen.fill(GREEN)
     pygame.draw.rect(screen,DARK_GREEN,(OFFSET - 5,OFFSET - 5,CELL_SIZE * NUMBER_OF_CELLS + 10,CELL_SIZE * NUMBER_OF_CELLS + 10),5)
@@ -196,6 +229,9 @@ while True:
 
     score_surface = score_display.render("SCORE:" + str(game.score).zfill(3),True,RED)
     screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 150, 35))
+
+    speaker_surface = speaker_on_surface if music_on else speaker_off_surface
+    screen.blit(speaker_surface, MUSIC_BTN_RECT)
 
     high_score_surface = high_score_display.render("HIGH SCORE: " + str(game.high_score).zfill(3), True, RED)
     screen.blit(high_score_surface, (CELL_SIZE * NUMBER_OF_CELLS - 160, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
