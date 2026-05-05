@@ -5,6 +5,7 @@ pygame.init()
 
 title_font = pygame.font.Font(None,60)
 score_display = pygame.font.Font(None,60)
+high_score_display = pygame.font.Font(None,40)
 developer_display = pygame.font.Font(None,40)
 
 #COLORS
@@ -69,13 +70,13 @@ class Snake:
     def apply_queued_direction(self):
         if self.direction_queue:
             self.direction = self.direction_queue.pop(0)
-        
 class Game:
     def __init__(self):
         self.snake = Snake()
         self.food = Food(self.snake.body)
         self.state = "RUNNING"
         self.score = 0
+        self.high_score = 0
 
     def draw(self):
         self.snake.draw()
@@ -95,6 +96,8 @@ class Game:
             self.snake.update(grow=will_grow)
             if will_grow:
                 self.score += 1
+                if self.score > self.high_score:
+                    self.high_score = self.score
                 self.food.positon = self.food.generate_random_pos(self.snake.body)
 
     def reset_game(self):
@@ -131,9 +134,8 @@ clock = pygame.time.Clock()
 game = Game()
 food_surface = pygame.image.load("Project-files/Graphics/apple.png")
 SNAKE_UPDATE = pygame.USEREVENT
-pygame.time.set_timer(SNAKE_UPDATE,200)
+pygame.time.set_timer(SNAKE_UPDATE,150)
 snake_length = len(game.snake.body)
-
 
 #MAIN GAME LOOP
 while True:
@@ -180,6 +182,12 @@ while True:
     score_surface = score_display.render(str(game.score).zfill(3),True,RED)
     screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 65, 20))
 
+    high_score_surface = high_score_display.render("HIGH SCORE: " + str(game.high_score).zfill(3), True, RED)
+    screen.blit(high_score_surface, (CELL_SIZE * NUMBER_OF_CELLS - 160, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
+
+    developer_surface = developer_display.render("By Hisham", True, RED)
+    screen.blit(developer_surface, (OFFSET - 5, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
+
     if game.state == "PAUSED":
         paused_surface = score_display.render("GAME PAUSED", True, RED)
         paused_rect = paused_surface.get_rect(center=(OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2, OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2 - 20))
@@ -198,8 +206,7 @@ while True:
         restart_rect = restart_surface.get_rect(center=(OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2, OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2 + 20))
         screen.blit(restart_surface, restart_rect)
 
-    developer_surface = developer_display.render("By Hisham mega super genius", True, RED)
-    screen.blit(developer_surface, (OFFSET - 5, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
+
 
     #OTHER STUFF
     pygame.display.update()
