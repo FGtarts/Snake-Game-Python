@@ -57,6 +57,7 @@ class Snake:
     def reset(self):
         self.body = [Vector2(6,9),Vector2(5,9),Vector2(4,9)]
         self.direction = Vector2(1,0)
+        
 class Game:
     def __init__(self):
         self.snake = Snake()
@@ -75,6 +76,12 @@ class Game:
             self.check_collision_with_border()
             self.check_collision_with_tail()
 
+    def reset_game(self):
+        self.snake.reset()
+        self.food.positon = self.food.generate_random_pos(self.snake.body)
+        self.score = 0
+        self.state = "RUNNING"
+
     def check_collision_with_food(self):
         if self.snake.body[0] == self.food.positon:
             self.food.positon = self.food.generate_random_pos(self.snake.body)
@@ -82,9 +89,9 @@ class Game:
             self.score += 1
 
     def check_collision_with_border(self):
-        if self.snake.body[0].x == NUMBER_OF_CELLS or self.snake.body[0].x == -1:
+        if self.snake.body[0].x == NUMBER_OF_CELLS -1 or self.snake.body[0].x == -1:
             self.game_over()
-        if self.snake.body[0].y == NUMBER_OF_CELLS or self.snake.body[0].y == -1:
+        if self.snake.body[0].y == NUMBER_OF_CELLS -1 or self.snake.body[0].y == -1:
             self.game_over()
 
     def check_collision_with_tail(self):
@@ -93,10 +100,7 @@ class Game:
             self.game_over()
 
     def game_over(self):
-        self.snake.reset()
-        self.food.positon = self.food.generate_random_pos(self.snake.body)
-        self.state = "PAUSED"
-        self.score = 0
+        self.state = "GAME_OVER"
 
 #SCREEN STUFF
 screen  = pygame.display.set_mode((2 * OFFSET + CELL_SIZE * NUMBER_OF_CELLS, 2 * OFFSET + CELL_SIZE * NUMBER_OF_CELLS))
@@ -108,6 +112,7 @@ game = Game()
 food_surface = pygame.image.load("Project-files/Graphics/apple.png")
 SNAKE_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SNAKE_UPDATE,200)
+snake_length = len(game.snake.body)
 
 
 #MAIN GAME LOOP
@@ -118,16 +123,25 @@ while True:
             game.update()
 
         if event.type == pygame.KEYDOWN:
-            if game.state == "PAUSED":
-                game.state = "RUNNING"
-            if event.key == pygame.K_UP and game.snake.direction != Vector2(0,1):
-                game.snake.direction = Vector2(0,-1)
-            if event.key == pygame.K_DOWN and game.snake.direction != Vector2(0,-1):
-                game.snake.direction = Vector2(0,1)
-            if event.key == pygame.K_RIGHT and game.snake.direction != Vector2(-1,0):
-                game.snake.direction = Vector2(1,0)
-            if event.key == pygame.K_LEFT and game.snake.direction != Vector2(1,0):
-                game.snake.direction = Vector2(-1,0)
+            #GAME STATE CONTROL
+            if event.key == pygame.K_SPACE:
+                if game.state == "RUNNING":
+                    game.state = "PAUSED"
+                elif game.state == "PAUSED":
+                    game.state = "RUNNING"
+            if event.key == pygame.K_r and game.state == "GAME_OVER":
+                game.reset_game()
+
+            #SNAKE DIRECTION CONTROL
+            if game.state == "RUNNING":
+                if event.key in (pygame.K_UP, pygame.K_w) and game.snake.direction != Vector2(0,1):
+                    game.snake.direction = Vector2(0,-1)
+                if event.key in (pygame.K_DOWN, pygame.K_s) and game.snake.direction != Vector2(0,-1):
+                    game.snake.direction = Vector2(0,1)
+                if event.key in (pygame.K_RIGHT, pygame.K_d) and game.snake.direction != Vector2(-1,0):
+                    game.snake.direction = Vector2(1,0)
+                if event.key in (pygame.K_LEFT, pygame.K_a) and game.snake.direction != Vector2(1,0):
+                    game.snake.direction = Vector2(-1,0)
 
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -145,6 +159,24 @@ while True:
 
     score_surface = score_display.render(str(game.score).zfill(3),True,RED)
     screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 65, 20))
+
+    if game.state == "PAUSED":
+        paused_surface = score_display.render("GAME PAUSED", True, RED)
+        paused_rect = paused_surface.get_rect(center=(OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2, OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2 - 20))
+        screen.blit(paused_surface, paused_rect)
+
+        hint_surface = developer_display.render("Press SPACE to continue", True, RED)
+        hint_rect = hint_surface.get_rect(center=(OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2, OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2 + 20))
+        screen.blit(hint_surface, hint_rect)
+
+    if game.state == "GAME_OVER":
+        game_over_surface = score_display.render("GAME OVER", True, RED)
+        game_over_rect = game_over_surface.get_rect(center=(OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2, OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2 - 20))
+        screen.blit(game_over_surface, game_over_rect)
+
+        restart_surface = developer_display.render("Press R to restart", True, RED)
+        restart_rect = restart_surface.get_rect(center=(OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2, OFFSET + (CELL_SIZE * NUMBER_OF_CELLS) // 2 + 20))
+        screen.blit(restart_surface, restart_rect)
 
     developer_surface = developer_display.render("By Hisham mega super genius", True, RED)
     screen.blit(developer_surface, (OFFSET - 5, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
