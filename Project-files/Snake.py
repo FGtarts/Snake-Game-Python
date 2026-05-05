@@ -44,6 +44,8 @@ class Snake:
         self.body = [Vector2(6,9),Vector2(5,9),Vector2(4,9)]
         self.direction = Vector2(1,0)
         self.direction_queue = []
+        self.eating_sound = pygame.mixer.Sound("Project-files/Sounds/eating.mp3")
+        self.collision_sound = pygame.mixer.Sound("Project-files/Sounds/collision.mp3")
 
     def draw(self):
         for segment in self.body:
@@ -97,6 +99,7 @@ class Game:
 
             self.snake.update(grow=will_grow)
             if will_grow:
+                self.snake.eating_sound.play()
                 self.score += 1
                 if self.score > self.high_score:
                     self.high_score = self.score
@@ -110,9 +113,11 @@ class Game:
 
     def check_collision_with_border(self, position):
         if position.x < 0 or position.x >= NUMBER_OF_CELLS:
+            self.snake.collision_sound.play()
             self.game_over()
             return True
         if position.y < 0 or position.y >= NUMBER_OF_CELLS:
+            self.snake.collision_sound.play()
             self.game_over()
             return True
         return False
@@ -120,6 +125,7 @@ class Game:
     def check_collision_with_tail(self, next_head, will_grow):
         body_to_check = self.snake.body if will_grow else self.snake.body[:-1]
         if next_head in body_to_check:
+            self.snake.collision_sound.play()
             self.game_over()
             return True
         return False
