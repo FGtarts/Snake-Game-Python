@@ -4,7 +4,7 @@ from pygame.math import Vector2
 pygame.init()
 
 title_font = pygame.font.Font(None,60)
-score_display = pygame.font.Font(None,60)
+score_display = pygame.font.Font(None,40)
 high_score_display = pygame.font.Font(None,40)
 developer_display = pygame.font.Font(None,40)
 
@@ -134,7 +134,7 @@ clock = pygame.time.Clock()
 game = Game()
 food_surface = pygame.image.load("Project-files/Graphics/apple.png")
 SNAKE_UPDATE = pygame.USEREVENT
-pygame.time.set_timer(SNAKE_UPDATE,150)
+pygame.time.set_timer(SNAKE_UPDATE,175)
 snake_length = len(game.snake.body)
 
 #MAIN GAME LOOP
@@ -179,13 +179,13 @@ while True:
     title_surface = title_font.render("Retro Snake", True, RED)
     screen.blit(title_surface,(OFFSET-5, 20))
 
-    score_surface = score_display.render(str(game.score).zfill(3),True,RED)
-    screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 65, 20))
+    score_surface = score_display.render("SCORE:" + str(game.score).zfill(3),True,RED)
+    screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 150, 35))
 
     high_score_surface = high_score_display.render("HIGH SCORE: " + str(game.high_score).zfill(3), True, RED)
     screen.blit(high_score_surface, (CELL_SIZE * NUMBER_OF_CELLS - 160, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
 
-    developer_surface = developer_display.render("By Hisham", True, RED)
+    developer_surface = developer_display.render("By Frogtarts", True, RED)
     screen.blit(developer_surface, (OFFSET - 5, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
 
     if game.state == "PAUSED":
