@@ -5,7 +5,7 @@ pygame.init()
 
 title_font = pygame.font.Font(None,60)
 score_display = pygame.font.Font(None,60)
-author_display = pygame.font.Font(None,40)
+developer_display = pygame.font.Font(None,40)
 
 #COLORS
 GREEN = (173,204,96)
@@ -146,8 +146,8 @@ while True:
     score_surface = score_display.render(str(game.score).zfill(3),True,RED)
     screen.blit(score_surface,(OFFSET + CELL_SIZE * NUMBER_OF_CELLS - 65, 20))
 
-    author_surface = author_display.render("By Hisham mega super genius", True, RED)
-    screen.blit(author_surface, (OFFSET - 5, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
+    developer_surface = developer_display.render("By Hisham mega super genius", True, RED)
+    screen.blit(developer_surface, (OFFSET - 5, OFFSET + CELL_SIZE * NUMBER_OF_CELLS + 10))
 
     #OTHER STUFF
     pygame.display.update()
